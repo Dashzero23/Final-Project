@@ -73,7 +73,7 @@ class Menu extends Phaser.Scene {
     create() {
         this.cameras.main.fadeIn(1000, 255, 255, 255);
         this.cameras.main.setBackgroundColor('#ffffff');
-
+        this.sound.stopAll();
         let bgm = this.sound.add("bgm", {loop : true, autoPlay: true});
         bgm.play();
         bgm.setVolume(1);
@@ -168,6 +168,8 @@ class Play extends Phaser.Scene {
         this.load.image('character', 'image/robber.png')
         this.load.image('cards', 'image/door.png')
         this.load.image('enemy1', 'image/fire.png')
+        this.load.audio("atkhit", "audio/atkhit.mp3");
+        this.load.audio("step", "audio/step.mp3");
     }
 
     create() {
@@ -251,9 +253,7 @@ class Play extends Phaser.Scene {
 
         function updateCountdown() {
             if (this.countdown <= 0) {
-                // Countdown has reached zero, handle the end of the timer
-                // For example, game over or level completion logic
-                // You can stop the timer by calling this.time.removeEvent(event), where `event` is the reference to the timer event.
+                this.scene.start('GoodEnd');
             }
 
             else {
@@ -261,8 +261,6 @@ class Play extends Phaser.Scene {
                 countdownText.setText(this.countdown.toString());
             }
         }
-
-       
 
         this.input.on('pointerdown', (pointer) => {
             const currentTime = this.time.now;
@@ -340,6 +338,10 @@ class Play extends Phaser.Scene {
     
     Cardhit(card, enemy) {
         // Destroy the card and enemy
+        let sfx = this.sound.add("atkhit", {loop : false, autoplay: true});
+        sfx.play();
+        sfx.setVolume(1);
+
         card.destroy();
         enemy.destroy();
     }
@@ -360,19 +362,32 @@ class Play extends Phaser.Scene {
 
     update() {
         if (!this.ended) { // Handle player movement
+            let movingUp = false;
+            let movingDown = false;
+            let movingLeft = false;
+            let movingRight = false;
+
             if (this.cursors.up.isDown) {
-                this.player.setVelocityY(-250); // Example: move up
+                this.movingUp = true;
+                this.player.setVelocityY(-250);
             } else if (this.cursors.down.isDown) {
-                this.player.setVelocityY(250); // Example: move down
+                this.movingDown = true;
+                this.player.setVelocityY(250);
             } else {
+                this.movingUp = false;
+                this.movingDown = false;
                 this.player.setVelocityY(0); // Stop vertical movement
             }
             
             if (this.cursors.left.isDown) {
-                this.player.setVelocityX(-250); // Example: move left
+                this.movingLeft = true;
+                this.player.setVelocityX(-250);
             } else if (this.cursors.right.isDown) {
-                this.player.setVelocityX(250); // Example: move right
+                this.movingRight = true;
+                this.player.setVelocityX(250);
             } else {
+                this.movingLeft = false;
+                this.movingRight = false
                 this.player.setVelocityX(0); // Stop horizontal movement
             }
 
@@ -390,6 +405,7 @@ class BadEnd extends Phaser.Scene {
     }
 
     create() {
+        this.cameras.main.fadeIn(1000, 255, 255, 255);
         this.cameras.main.setBackgroundColor('#ffffff');
 
         let textConfig = {
@@ -397,12 +413,37 @@ class BadEnd extends Phaser.Scene {
             color: '#000000'
         };
 
-        let endText = this.add.text(desiredWidth / 2, desiredHeight / 2, "      Bad End\nLeft click to restart", textConfig).setOrigin(0.5);
+        let endText = this.add.text(desiredWidth / 2, desiredHeight / 2, "Bad Ending: You got caught\nLeft click to restart", textConfig).setOrigin(0.5);
         this.input.on('pointerdown', (pointer) => {
             // Check if left button was pressed
             if (pointer.leftButtonDown()) {
                 // Transition to the Play scene
-                this.scene.start('Play');
+                this.scene.start('Menu');
+            }
+        }); 
+    }
+}
+
+class GoodEnd extends Phaser.Scene {
+    constructor() {
+        super({key: 'GoodEnd'});
+    }
+
+    create() {
+        this.cameras.main.fadeIn(1000, 255, 255, 255);
+        this.cameras.main.setBackgroundColor('#ffffff');
+        
+        let textConfig = {
+            fontSize: Math.round(game.config.width * 0.025) + 'px', // Adjust the scaling factor as needed
+            color: '#000000'
+        };
+
+        let endText = this.add.text(desiredWidth / 2, desiredHeight / 2, "Good Ending: You survived\nLeft click to restart", textConfig).setOrigin(0.5);
+        this.input.on('pointerdown', (pointer) => {
+            // Check if left button was pressed
+            if (pointer.leftButtonDown()) {
+                // Transition to the Play scene
+                this.scene.start('Menu');
             }
         }); 
     }
@@ -419,7 +460,7 @@ class Credit extends Phaser.Scene {
             fontSize: Math.round(game.config.width * 0.025) + 'px', // Adjust the scaling factor as needed
             color: '#000000'
         };
-        let tempSet = this.add.text(desiredWidth / 2, desiredHeight / 2, "Core gameplay: Nguyen Vu\nArt: Jeevithan Mahenthran\nConcepts and interaction: Gabriel Yunjia", textConfig).setOrigin(0.5);
+        let tempSet = this.add.text(desiredWidth / 2, desiredHeight / 2, "Core gameplay: Nguyen Vu\nArt: Jeevithan Mahenthran\nConcepts and Cinematic: Gabriel Yunjia", textConfig).setOrigin(0.5);
         let textBack = this.add.text(desiredWidth * 0.1, desiredHeight * 0.9, "Back", textConfig).setOrigin(0.5);
         let back = this.add.rectangle(desiredWidth * 0.1, desiredHeight * 0.9, desiredWidth* (200/1080), desiredHeight * (100/600), 0x000000);
         back.setAlpha(0.001);
