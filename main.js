@@ -23,7 +23,7 @@ const config = {
         debug: false
     }
 },
-  scene: [Menu, Play, Credit, BadEnd],
+  scene: [Menu, Play, Credit, BadEnd, GoodEnd],
   scale: {autoCenter: Phaser.Scale.CENTER_BOTH}
 };
 
