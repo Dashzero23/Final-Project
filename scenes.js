@@ -8,11 +8,19 @@ class Menu extends Phaser.Scene {
         //this.load.image("title", "image/title.png");
         this.load.image("hand", "image/PokerHandMenu.png");
         //this.load.image("bg", "image/background.png");
+        this.load.image("hand", "image/PokerHandMenu.png");
+        this.load.image("audio", "image/audio.png");
+        this.load.audio("bgm", "audio/bgm.mp3");
     }    
 
     create() {
         this.cameras.main.fadeIn(1000, 255, 255, 255);
         this.cameras.main.setBackgroundColor('#ffffff');
+
+        let bgm = this.sound.add("bgm", {loop : true, autoPlay: true});
+        bgm.play();
+        bgm.setVolume(1);
+        let isPlaying = true;
 
         // Enable global drag input
         this.input.on('dragstart', function (pointer) {
@@ -34,6 +42,23 @@ class Menu extends Phaser.Scene {
 
         // Set the scale to fit the entire screen
         //bg.setScale(game.config.width / bg.width, game.config.height / bg.height);
+        let audio = this.add.image(desiredWidth * (50/1080), desiredHeight * (50/600), "audio");
+        audio.setScale(0.1*(game.config.width / audio.width), 0.1*(game.config.height / audio.height));
+        audio.setInteractive();
+
+        audio.on('pointerup', function() {
+            if (isPlaying) {
+                this.sound.stopAll();
+                isPlaying = false;
+            }
+
+            else {
+                bgm.play();
+                bgm.setVolume(1);
+                isPlaying = true;
+            }
+        }, this);
+        
         let poker = this.add.image(desiredWidth * (750/1080), this.cameras.main.centerY, "hand");
         poker.setScale(0.5*(game.config.width / poker.width), game.config.height / poker.height);
 
