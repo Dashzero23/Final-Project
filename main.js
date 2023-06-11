@@ -1,3 +1,4 @@
+let desiredWidth, desiredHeight;
 // Create the Phaser game configuration
 var browserWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
 var browserHeight = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
@@ -6,8 +7,8 @@ var browserHeight = window.innerHeight || document.documentElement.clientHeight 
 var isPortrait = browserHeight > browserWidth;
 
 // Calculate the desired width and height based on the aspect ratio
-var desiredWidth = isPortrait ? browserHeight * (1080 / 600) : browserWidth;
-var desiredHeight = isPortrait ? browserHeight : browserWidth * (600 / 1080);
+desiredWidth = isPortrait ? browserHeight * (1080 / 600) : browserWidth;
+desiredHeight = isPortrait ? browserHeight : browserWidth * (600 / 1080);
 
 desiredHeight *= 0.85;
 desiredWidth *= 0.9;
@@ -22,7 +23,7 @@ const config = {
         debug: false
     }
 },
-  scene: [Menu, Play, Credit],
+  scene: [Menu, Play, Credit, BadEnd],
   scale: {autoCenter: Phaser.Scale.CENTER_BOTH}
 };
 

@@ -86,12 +86,18 @@ class Play extends Phaser.Scene {
         this.load.image('character', 'image/robber.png')
         this.load.image('cards', 'image/door.png')
         this.load.image('enemy1', 'image/fire.png')
-
     }
 
     create() {
         this.cameras.main.setBackgroundColor('#ffffff');
         this.enemies = this.physics.add.group();
+        this.cards = this.physics.add.group();
+        this.ended = false;
+ 
+        let textConfig = {
+            fontSize: Math.round(game.config.width * 0.025) + 'px', // Adjust the scaling factor as needed
+            color: '#000000'
+        };
 
         let background = this.add.image(0, 0, 'ground');
         background.setScale(desiredWidth / background.width, desiredHeight / background.height);
@@ -109,6 +115,29 @@ class Play extends Phaser.Scene {
         this.physics.world.enable(this.player);
         this.player.setCollideWorldBounds(true);
 
+        this.time.addEvent({
+            delay: 5000, // 5 seconds
+            loop: true,
+            callback: this.spawnEnemy,
+            callbackScope: this
+        });
+
+        this.time.addEvent({
+            delay: 15000, // 5 second
+            callback: this.spawnEnemy,
+            callbackScope: this,
+            loop: true
+        });
+
+        this.time.addEvent({
+            delay: 20000, // 5 second
+            callback: this.spawnEnemy,
+            callbackScope: this,
+            loop: true
+        });
+
+        this.physics.add.collider(this.player, this.enemies, this.Playerhit, null, this);
+
         this.cursors = this.input.keyboard.addKeys({
             up: Phaser.Input.Keyboard.KeyCodes.W,
             down: Phaser.Input.Keyboard.KeyCodes.S,
@@ -116,8 +145,42 @@ class Play extends Phaser.Scene {
             right: Phaser.Input.Keyboard.KeyCodes.D
         });
 
-        this.cardDelay = 2000; // Delay between card throws in milliseconds
+        this.cardDelay = 1500; // Delay between card throws in milliseconds
         this.lastCardTime = 0; // Timestamp of the last card throw
+
+        let countdownTextCreated = false;
+        let countdownText = this.add.text(desiredWidth / 2, desiredHeight * 0.1, '', textConfig);
+
+        if (!countdownTextCreated) {
+            countdownText.setText('60');
+            countdownText.setOrigin(0.5);
+            countdownText.setScrollFactor(0);
+            countdownTextCreated = true;
+        }
+
+        this.countdown = 60;
+
+        this.time.addEvent({
+            delay: 1000, // 1 second
+            callback: updateCountdown,
+            callbackScope: this,
+            loop: true
+        });
+
+        function updateCountdown() {
+            if (this.countdown <= 0) {
+                // Countdown has reached zero, handle the end of the timer
+                // For example, game over or level completion logic
+                // You can stop the timer by calling this.time.removeEvent(event), where `event` is the reference to the timer event.
+            }
+
+            else {
+                this.countdown--;
+                countdownText.setText(this.countdown.toString());
+            }
+        }
+
+       
 
         this.input.on('pointerdown', (pointer) => {
             const currentTime = this.time.now;
@@ -138,7 +201,7 @@ class Play extends Phaser.Scene {
                     const card = this.physics.add.sprite(playerX, playerY, 'cards');
                     const cardAngle = angle + Phaser.Math.DegToRad(i * 15);
                     const cardSpeed = 500;
-            
+                    this.cards.add(card);
                     // Set the velocity of the card towards the pointer
                     card.setVelocity(
                         Math.cos(cardAngle) * cardSpeed,
@@ -150,75 +213,116 @@ class Play extends Phaser.Scene {
                     this.time.delayedCall(3000, () => {
                         card.destroy();
                     }, [], this);
+
+                    
                 }
             }
 
-            this.time.addEvent({
-                delay: 1000, // 10 seconds
-                loop: true,
-                callback: this.spawnEnemy,
-                callbackScope: this
-            });
-
-            
+            this.physics.add.collider(this.cards, this.enemies, this.Cardhit, null, this);
         });
     }
-    
+
     spawnEnemy() {
-        const spawnDistance = desiredWidth; // Adjust the distance from the player as needed
-        const enemyCount = 5; // Number of enemies to spawn
-        const spacing = 50; // Spacing between each enemy
-    
-        // Calculate the total width of all enemies and spacing
-        const totalWidth = (enemyCount - 1) * spacing;
-        // Get a random number between 0 and 1
-        let randomValue = Phaser.Math.Between(0, 1);
+        if (!this.ended) {
+            //const spawnDistance = desiredWidth; // Adjust the distance from the player as needed
+            const enemyCount = 5; // Number of enemies to spawn
+            const spacing = 50; // Spacing between each enemy
+        
+            // Calculate the total width of all enemies and spacing
+            const totalWidth = (enemyCount - 1) * spacing;
+            // Get a random number between 0 and 1
+            let randomValue = Phaser.Math.Between(0, 1);
 
-        // Map the randomValue to a range of 1 and -1
-        let randomSign = randomValue === 0 ? -1 : 1;
+            // Map the randomValue to a range of 1 and -1
+            let randomSign = randomValue === 0 ? -1 : 1;
 
-        // Calculate the starting X position
-        const startX = this.player.x + (desiredWidth * 0.5 * randomSign);
-    
-        for (let i = 0; i < enemyCount; i++) {
-            // Calculate the spawn position based on the current index
-            const spawnX = startX + i * spacing;
-            const spawnY = this.player.y * 0.5* randomSign;
-    
-            // Create the enemy sprite at the spawn position
-            const enemy = this.physics.add.sprite(spawnX, spawnY, 'enemy1');
-            enemy.setScale(0.2);
-            this.enemies.add(enemy, true);
+            // Calculate the starting X position
+            const startX = this.player.x + (desiredWidth * 0.5 * randomSign);
+        
+            for (let i = 0; i < enemyCount; i++) {
+                // Calculate the spawn position based on the current index
+                const spawnX = startX + i * spacing;
+                const spawnY = this.player.y * 0.5* randomSign;
+        
+                // Create the enemy sprite at the spawn position
+                const enemy = this.physics.add.sprite(spawnX, spawnY, 'enemy1');
+                enemy.setScale(0.2);
+                this.enemies.add(enemy, true);
 
-            enemy.body.setCollideWorldBounds(true);
+                enemy.body.setCollideWorldBounds(true);
 
-            // ...
+                // ...
+            }
         }
     }
     
-    update() {
-        // Handle player movement
-        if (this.cursors.up.isDown) {
-            this.player.setVelocityY(-1000); // Example: move up
-        } else if (this.cursors.down.isDown) {
-            this.player.setVelocityY(1000); // Example: move down
-        } else {
-            this.player.setVelocityY(0); // Stop vertical movement
-        }
-        
-        if (this.cursors.left.isDown) {
-            this.player.setVelocityX(-1000); // Example: move left
-        } else if (this.cursors.right.isDown) {
-            this.player.setVelocityX(1000); // Example: move right
-        } else {
-            this.player.setVelocityX(0); // Stop horizontal movement
-        }
-
-        this.enemies.getChildren().forEach((enemy) => {
-            // Move the enemy towards the player
-            this.physics.moveToObject(enemy, this.player, 100);
+    Cardhit(card, enemy) {
+        // Destroy the card and enemy
+        card.destroy();
+        enemy.destroy();
+    }
+    
+    Playerhit(player, enemy) {
+        this.ended = true;
+        this.tweens.add({
+            targets: player,
+            angle: '+=' + 90, // Rotate by 90 degrees to the right
+            duration: 1000,
+            ease: 'Linear',
+            onComplete: () => {
+                this.scene.start('BadEnd');
+            },
+            callbackScope: this
         });
-          
+    }
+
+    update() {
+        if (!this.ended) { // Handle player movement
+            if (this.cursors.up.isDown) {
+                this.player.setVelocityY(-250); // Example: move up
+            } else if (this.cursors.down.isDown) {
+                this.player.setVelocityY(250); // Example: move down
+            } else {
+                this.player.setVelocityY(0); // Stop vertical movement
+            }
+            
+            if (this.cursors.left.isDown) {
+                this.player.setVelocityX(-250); // Example: move left
+            } else if (this.cursors.right.isDown) {
+                this.player.setVelocityX(250); // Example: move right
+            } else {
+                this.player.setVelocityX(0); // Stop horizontal movement
+            }
+
+            this.enemies.getChildren().forEach((enemy) => {
+                // Move the enemy towards the player
+                this.physics.moveToObject(enemy, this.player, 320);
+            });
+        }
+    }
+}
+
+class BadEnd extends Phaser.Scene {
+    constructor() {
+        super({key: 'BadEnd'});
+    }
+
+    create() {
+        this.cameras.main.setBackgroundColor('#ffffff');
+
+        let textConfig = {
+            fontSize: Math.round(game.config.width * 0.025) + 'px', // Adjust the scaling factor as needed
+            color: '#000000'
+        };
+
+        let endText = this.add.text(desiredWidth / 2, desiredHeight / 2, "      Bad End\nLeft click to restart", textConfig).setOrigin(0.5);
+        this.input.on('pointerdown', (pointer) => {
+            // Check if left button was pressed
+            if (pointer.leftButtonDown()) {
+                // Transition to the Play scene
+                this.scene.start('Play');
+            }
+        }); 
     }
 }
 
