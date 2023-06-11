@@ -1,3 +1,60 @@
+class Intro extends Phaser.Scene {
+    constructor() {
+        super({key: "Intro"});
+    }
+
+    preload() {
+        this.load.path = "./assets/";
+        this.load.image("Logo", "image/logo.png");
+        
+
+     
+    }    
+
+    create() {
+        let centerX = this.cameras.main.width / 2;
+        this.isAnimationFinished = false;
+        
+
+
+
+        let Logo = this.add.sprite(centerX, 300, "Logo");
+        Logo.alpha = 0;
+        this.tweens.add({
+          targets: Logo,
+          alpha: 1,
+          duration: 1000,
+        });
+
+        this.tweens.add({
+            targets: Logo,
+            alpha: 0,
+            delay: 2000,  // Delay in milliseconds before starting the fade out animation
+            duration: 1000,
+          });
+
+        this.time.addEvent({
+            delay: 3250,
+            callback: () => {
+                this.onAnimationComplete();
+            },
+            callbackScope: this
+        });
+    
+    }
+
+    onAnimationComplete() {
+        this.isAnimationFinished = true;
+    }
+
+    update() {
+        if (this.isAnimationFinished) {
+          this.scene.start("Menu");
+        }
+    }
+}
+
+
 class Menu extends Phaser.Scene {
     constructor() {
         super({key: "Menu"});
