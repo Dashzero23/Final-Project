@@ -165,7 +165,7 @@ class Play extends Phaser.Scene {
         this.load.path = "./assets/";
         //this.load.image("title", "image/title.png");
         this.load.image('ground', 'image/background.png')
-        this.load.image('character', 'image/bobbytheMC.png')
+        //this.load.image('character', 'image/bobbytheMC.png')
         this.load.image('ground', 'image/ground.png')
         this.load.image('character', 'image/mc.png')
         this.load.image('cards', 'image/tfcard.png')
