@@ -153,7 +153,7 @@ class Menu extends Phaser.Scene {
         playRect.setInteractive(); // Make the rectangle interactive for input events
 
         playRect.on('pointerup', function() {
-          this.scene.start("Play");
+          this.scene.start("Instruct");
         }, this);
 
         let setRect = this.add.rectangle(desiredWidth * (740/1080), desiredHeight * (100/600), desiredWidth* (160/1080), desiredHeight * (180/600), 0x000000);
@@ -175,6 +175,30 @@ class Menu extends Phaser.Scene {
     }
 }
 
+class Instruct extends Phaser.Scene {
+    constructor() {
+        super({key: "Instruct"});
+    }
+
+    create() {
+        this.cameras.main.fadeIn(1000, 255, 255, 255);
+        this.cameras.main.setBackgroundColor('#ffffff');
+
+        let textConfig = {
+            fontSize: Math.round(game.config.width * 0.025) + 'px', // Adjust the scaling factor as needed
+            color: '#000000'
+        };
+
+        let intruct = this.add.text(desiredWidth / 2, desiredHeight / 2, "Use the D-pad or WASD to move\nClick on the screen to shoot\nKill the cops before they get you\nClear current room to move to the next one\nGood luck escaping", textConfig).setOrigin(0.5);
+        this.input.on('pointerdown', (pointer) => {
+            // Check if left button was pressed
+            if (pointer.leftButtonDown()) {
+                // Transition to the Play scene
+                this.scene.start('Play');
+            }
+        }); 
+    }
+}
 class Play extends Phaser.Scene {
     constructor() {
         super({key: "Play"});
@@ -199,6 +223,8 @@ class Play extends Phaser.Scene {
             color: '#ffffff'
         };
 
+        this.isMoving = false;
+        
         let background = this.add.image(0, 0, 'ground');
         this.scalex = desiredWidth / background.width
         this.scaley = desiredHeight / background.height
@@ -283,7 +309,6 @@ class Play extends Phaser.Scene {
         }
 
         let controlRect = new Phaser.Geom.Rectangle(40 * this.scalex, 440 * this.scaley, 210 * this.scalex, 220 * this.scaley);
-        let shootPointer;
         
         this.input.on('pointerdown', (pointer) => {
           const currentTime = this.time.now;
@@ -293,7 +318,7 @@ class Play extends Phaser.Scene {
             return;
           }
         
-          if (!shootPointer && currentTime - this.lastCardTime >= this.cardDelay) {
+          if (!this.isMoving && currentTime - this.lastCardTime >= this.cardDelay) {
             this.lastCardTime = currentTime;
         
             const playerX = this.player.x;
@@ -417,24 +442,30 @@ class Play extends Phaser.Scene {
             graphics.fillRectShape(rightRect).setScrollFactor(0);
 
             if (this.cursors.up.isDown || Phaser.Geom.Rectangle.Contains(upRect, this.input.activePointer.x, this.input.activePointer.y)) {
+                this.isMoving = true;
                 this.player.setVelocityY(-250);
             } else if (this.cursors.down.isDown || Phaser.Geom.Rectangle.Contains(downRect, this.input.activePointer.x, this.input.activePointer.y)) {
+                this.isMoving = true;
                 this.player.setVelocityY(250);
             } else {
+                this.isMoving = false;
                 this.player.setVelocityY(0); // Stop vertical movement
             }
             
             if (this.cursors.left.isDown || Phaser.Geom.Rectangle.Contains(leftRect, this.input.activePointer.x, this.input.activePointer.y)) {
+                this.isMoving = true;
                 this.player.setVelocityX(-250);
             } else if (this.cursors.right.isDown || Phaser.Geom.Rectangle.Contains(rightRect, this.input.activePointer.x, this.input.activePointer.y)) {
+                this.isMoving = true;
                 this.player.setVelocityX(250);
             } else {
+                this.isMoving = false;
                 this.player.setVelocityX(0); // Stop horizontal movement
             }
     
             this.enemies.getChildren().forEach((enemy) => {
                 // Move the enemy towards the player
-                this.physics.moveToObject(enemy, this.player, 320);
+                this.physics.moveToObject(enemy, this.player, 270);
             });
         }
     }
