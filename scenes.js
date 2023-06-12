@@ -54,7 +54,6 @@ class Intro extends Phaser.Scene {
     }
 }
 
-
 class Menu extends Phaser.Scene {
     constructor() {
         super({key: "Menu"});
@@ -64,8 +63,7 @@ class Menu extends Phaser.Scene {
         this.load.path = "./assets/";
         //this.load.image("title", "image/title.png");
         this.load.image("hand", "image/PokerHandMenu.png");
-        //this.load.image("bg", "image/background.png");
-        this.load.image("hand", "image/PokerHandMenu.png");
+        this.load.image("bg", "image/bg.png");
         this.load.image("audio", "image/audio.png");
         this.load.audio("bgm", "audio/bgm.mp3");
     }    
@@ -95,10 +93,12 @@ class Menu extends Phaser.Scene {
             // Store the new initial drag position for the next drag event
             initialDragX = pointer.x;
         }, this);
-        //let bg = this.add.image(0, 0, 'bg').setOrigin(0);
+
+        let bg = this.add.image(0, 0, 'bg').setOrigin(0);
 
         // Set the scale to fit the entire screen
-        //bg.setScale(game.config.width / bg.width, game.config.height / bg.height);
+        bg.setScale(game.config.width / bg.width, game.config.height / bg.height);
+        
         let audio = this.add.image(desiredWidth * (50/1080), desiredHeight * (50/600), "audio");
         audio.setScale(0.1*(game.config.width / audio.width), 0.1*(game.config.height / audio.height));
         audio.setInteractive();
@@ -163,13 +163,11 @@ class Play extends Phaser.Scene {
 
     preload() {
         this.load.path = "./assets/";
-        //this.load.image("title", "image/title.png");
         this.load.image('ground', 'image/ground.png')
-        this.load.image('character', 'image/robber.png')
+        this.load.image('character', 'image/mc.png')
         this.load.image('cards', 'image/door.png')
-        this.load.image('enemy1', 'image/fire.png')
+        this.load.image('enemy1', 'image/police.png')
         this.load.audio("atkhit", "audio/atkhit.mp3");
-        this.load.audio("step", "audio/step.mp3");
     }
 
     create() {
@@ -194,7 +192,7 @@ class Play extends Phaser.Scene {
         // Set the size of the physics world to match the scaled background size
         this.physics.world.setBounds(0.7*(-scaledWidth/2), 0.7*(-scaledHeight/2), 0.9*(scaledWidth), 0.9*(scaledHeight));
 
-        this.player = this.physics.add.sprite(desiredWidth / 2, desiredHeight / 2, 'character').setScale(0.2);
+        this.player = this.physics.add.sprite(desiredWidth / 2, desiredHeight / 2, 'character').setScale(1);
         this.cameras.main.startFollow(this.player);
         this.physics.world.enable(this.player);
         this.player.setCollideWorldBounds(true);
@@ -326,7 +324,7 @@ class Play extends Phaser.Scene {
         
                 // Create the enemy sprite at the spawn position
                 const enemy = this.physics.add.sprite(spawnX, spawnY, 'enemy1');
-                enemy.setScale(0.2);
+                enemy.setScale(1);
                 this.enemies.add(enemy, true);
 
                 enemy.body.setCollideWorldBounds(true);
