@@ -164,10 +164,10 @@ class Play extends Phaser.Scene {
     preload() {
         this.load.path = "./assets/";
         //this.load.image("title", "image/title.png");
-        this.load.image('ground', 'image/ground.png')
-        this.load.image('character', 'image/robber.png')
+        this.load.image('ground', 'image/background.png')
+        this.load.image('character', 'image/bobbytheMC.png')
         this.load.image('cards', 'image/door.png')
-        this.load.image('enemy1', 'image/fire.png')
+        this.load.image('enemy1', 'image/police.png')
         this.load.audio("atkhit", "audio/atkhit.mp3");
         this.load.audio("step", "audio/step.mp3");
     }
@@ -185,7 +185,7 @@ class Play extends Phaser.Scene {
 
         let background = this.add.image(0, 0, 'ground');
         background.setScale(desiredWidth / background.width, desiredHeight / background.height);
-        background.setScale(10); // Set the scale to make it 10 times bigger
+        background.setScale(5); // Set the scale to make it 10 times bigger
         background.setPosition(desiredWidth / 2, desiredHeight / 2);
         // Get the scaled dimensions of the background image
         const scaledWidth = background.width * background.scaleX;
@@ -194,7 +194,7 @@ class Play extends Phaser.Scene {
         // Set the size of the physics world to match the scaled background size
         this.physics.world.setBounds(0.7*(-scaledWidth/2), 0.7*(-scaledHeight/2), 0.9*(scaledWidth), 0.9*(scaledHeight));
 
-        this.player = this.physics.add.sprite(desiredWidth / 2, desiredHeight / 2, 'character').setScale(0.2);
+        this.player = this.physics.add.sprite(desiredWidth / 2, desiredHeight / 2, 'character').setScale(1);
         this.cameras.main.startFollow(this.player);
         this.physics.world.enable(this.player);
         this.player.setCollideWorldBounds(true);
@@ -326,7 +326,7 @@ class Play extends Phaser.Scene {
         
                 // Create the enemy sprite at the spawn position
                 const enemy = this.physics.add.sprite(spawnX, spawnY, 'enemy1');
-                enemy.setScale(0.2);
+                enemy.setScale(1);
                 this.enemies.add(enemy, true);
 
                 enemy.body.setCollideWorldBounds(true);
