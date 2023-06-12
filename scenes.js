@@ -6,18 +6,12 @@ class Intro extends Phaser.Scene {
     preload() {
         this.load.path = "./assets/";
         this.load.image("Logo", "image/logo.png");
-        
-
-     
     }    
 
     create() {
         let centerX = this.cameras.main.width / 2;
         this.isAnimationFinished = false;
         
-
-
-
         let Logo = this.add.sprite(centerX, 300, "Logo");
         Logo.alpha = 0;
         this.tweens.add({
@@ -166,7 +160,7 @@ class Play extends Phaser.Scene {
         //this.load.image("title", "image/title.png");
         //this.load.image('ground', 'image/background.png')
         //this.load.image('character', 'image/bobbytheMC.png')
-        this.load.image('ground', 'image/ground.png')
+        this.load.image('ground', 'image/background.png')
         this.load.image('character', 'image/mc.png')
         this.load.image('cards', 'image/tfcard.png')
         this.load.image('enemy1', 'image/police.png')
@@ -186,14 +180,14 @@ class Play extends Phaser.Scene {
 
         let background = this.add.image(0, 0, 'ground');
         background.setScale(desiredWidth / background.width, desiredHeight / background.height);
-        background.setScale(5); // Set the scale to make it 10 times bigger
+        background.setScale(15); // Set the scale to make it 10 times bigger
         background.setPosition(desiredWidth / 2, desiredHeight / 2);
         // Get the scaled dimensions of the background image
         const scaledWidth = background.width * background.scaleX;
         const scaledHeight = background.height * background.scaleY;
 
         // Set the size of the physics world to match the scaled background size
-        this.physics.world.setBounds(0.7*(-scaledWidth/2), 0.7*(-scaledHeight/2), 0.9*(scaledWidth), 0.9*(scaledHeight));
+        this.physics.world.setBounds(0.43*(-scaledWidth/2), 0.35*(-scaledHeight/2), 0.5*(scaledWidth), 0.4*(scaledHeight));
 
         this.player = this.physics.add.sprite(desiredWidth / 2, desiredHeight / 2, 'character').setScale(1);
         this.cameras.main.startFollow(this.player);
@@ -208,14 +202,14 @@ class Play extends Phaser.Scene {
         });
 
         this.time.addEvent({
-            delay: 15000, // 5 second
+            delay: 15000, // 15 second
             callback: this.spawnEnemy,
             callbackScope: this,
             loop: true
         });
 
         this.time.addEvent({
-            delay: 20000, // 5 second
+            delay: 20000, // 20 second
             callback: this.spawnEnemy,
             callbackScope: this,
             loop: true
