@@ -168,7 +168,7 @@ class Play extends Phaser.Scene {
         this.load.image('character', 'image/bobbytheMC.png')
         this.load.image('ground', 'image/ground.png')
         this.load.image('character', 'image/mc.png')
-        this.load.image('cards', 'image/door.png')
+        this.load.image('cards', 'image/tfcard.png')
         this.load.image('enemy1', 'image/police.png')
         this.load.audio("atkhit", "audio/atkhit.mp3");
     }
