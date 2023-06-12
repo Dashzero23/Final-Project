@@ -163,9 +163,6 @@ class Play extends Phaser.Scene {
 
     preload() {
         this.load.path = "./assets/";
-        //this.load.image("title", "image/title.png");
-        this.load.image('ground', 'image/background.png')
-        this.load.image('character', 'image/bobbytheMC.png')
         this.load.image('ground', 'image/ground.png')
         this.load.image('character', 'image/mc.png')
         this.load.image('cards', 'image/door.png')
@@ -186,7 +183,7 @@ class Play extends Phaser.Scene {
 
         let background = this.add.image(0, 0, 'ground');
         background.setScale(desiredWidth / background.width, desiredHeight / background.height);
-        background.setScale(5); // Set the scale to make it 10 times bigger
+        background.setScale(10); // Set the scale to make it 10 times bigger
         background.setPosition(desiredWidth / 2, desiredHeight / 2);
         // Get the scaled dimensions of the background image
         const scaledWidth = background.width * background.scaleX;
@@ -240,7 +237,6 @@ class Play extends Phaser.Scene {
             countdownText.setText('60');
             countdownText.setOrigin(0.5);
             countdownText.setScrollFactor(0);
-            //countdownText.background("#FFFFFF");
             countdownTextCreated = true;
         }
 
