@@ -283,10 +283,11 @@ class Play extends Phaser.Scene {
         }
 
         let controlRect = new Phaser.Geom.Rectangle(40 * this.scalex, 440 * this.scaley, 210 * this.scalex, 220 * this.scaley);
+        const shootPointer = this.input.addPointer();
 
-        this.input.on('pointerdown', (pointer) => {
+        this.input.on('pointerdown', (shootPointer) => {
             const currentTime = this.time.now;
-            const isPointerInControlArea = controlRect.contains(pointer.x, pointer.y);
+            const isPointerInControlArea = controlRect.contains(shootPointer.x, shootPointer.y);
 
             if (isPointerInControlArea) {
                 return;
@@ -297,8 +298,8 @@ class Play extends Phaser.Scene {
 
                 const playerX = this.player.x;
                 const playerY = this.player.y;
-                const pointerX = pointer.worldX;
-                const pointerY = pointer.worldY;
+                const pointerX = shootPointer.worldX;
+                const pointerY = shootPointer.worldY;
             
                 // Calculate the angle between the player and the pointer
                 const angle = Phaser.Math.Angle.Between(playerX, playerY, pointerX, pointerY);
