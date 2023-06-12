@@ -32,7 +32,7 @@ if (!isPortrait) {
           debug: false
       }
   },
-    scene: [Guide, Intro, Menu, Play, Credit, BadEnd, GoodEnd],
+    scene: [Guide, Intro, Menu, Instruct, Play, Credit, BadEnd, GoodEnd],
     scale: {autoCenter: Phaser.Scale.CENTER_BOTH}
   };
 }
@@ -48,7 +48,7 @@ else {
           debug: false
       }
     },
-    scene: [Guide, Intro, Menu, Play, Credit, BadEnd, GoodEnd],
+    scene: [Guide, Intro, Menu, Instruct, Play, Credit, BadEnd, GoodEnd],
   };
 }
 
