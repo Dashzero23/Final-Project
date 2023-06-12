@@ -163,14 +163,11 @@ class Play extends Phaser.Scene {
 
     preload() {
         this.load.path = "./assets/";
-<<<<<<< HEAD
         //this.load.image("title", "image/title.png");
         this.load.image('ground', 'image/background.png')
         this.load.image('character', 'image/bobbytheMC.png')
-=======
         this.load.image('ground', 'image/ground.png')
         this.load.image('character', 'image/mc.png')
->>>>>>> 11fabd25a6d933e6f0d6298d19346c2831a719f3
         this.load.image('cards', 'image/door.png')
         this.load.image('enemy1', 'image/police.png')
         this.load.audio("atkhit", "audio/atkhit.mp3");
@@ -243,6 +240,7 @@ class Play extends Phaser.Scene {
             countdownText.setText('60');
             countdownText.setOrigin(0.5);
             countdownText.setScrollFactor(0);
+            //countdownText.background("#FFFFFF");
             countdownTextCreated = true;
         }
 
