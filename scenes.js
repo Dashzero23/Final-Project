@@ -63,7 +63,7 @@ class Menu extends Phaser.Scene {
         this.load.path = "./assets/";
         //this.load.image("title", "image/title.png");
         this.load.image("hand", "image/PokerHandMenu.png");
-        this.load.image("bg", "image/bg.png");
+        this.load.image("bg", "image/background.png");
         this.load.image("audio", "image/audio.png");
         this.load.audio("bgm", "audio/bgm.mp3");
     }    
@@ -163,7 +163,7 @@ class Play extends Phaser.Scene {
 
     preload() {
         this.load.path = "./assets/";
-        this.load.image('ground', 'image/ground.png')
+        this.load.image('ground', 'image/bg.png')
         this.load.image('character', 'image/mc.png')
         this.load.image('cards', 'image/door.png')
         this.load.image('enemy1', 'image/police.png')
