@@ -54,7 +54,6 @@ class Intro extends Phaser.Scene {
     }
 }
 
-
 class Menu extends Phaser.Scene {
     constructor() {
         super({key: "Menu"});
@@ -64,8 +63,7 @@ class Menu extends Phaser.Scene {
         this.load.path = "./assets/";
         //this.load.image("title", "image/title.png");
         this.load.image("hand", "image/PokerHandMenu.png");
-        //this.load.image("bg", "image/background.png");
-        this.load.image("hand", "image/PokerHandMenu.png");
+        this.load.image("bg", "image/bg.png");
         this.load.image("audio", "image/audio.png");
         this.load.audio("bgm", "audio/bgm.mp3");
     }    
@@ -95,10 +93,12 @@ class Menu extends Phaser.Scene {
             // Store the new initial drag position for the next drag event
             initialDragX = pointer.x;
         }, this);
-        //let bg = this.add.image(0, 0, 'bg').setOrigin(0);
+
+        let bg = this.add.image(0, 0, 'bg').setOrigin(0);
 
         // Set the scale to fit the entire screen
-        //bg.setScale(game.config.width / bg.width, game.config.height / bg.height);
+        bg.setScale(game.config.width / bg.width, game.config.height / bg.height);
+        
         let audio = this.add.image(desiredWidth * (50/1080), desiredHeight * (50/600), "audio");
         audio.setScale(0.1*(game.config.width / audio.width), 0.1*(game.config.height / audio.height));
         audio.setInteractive();
@@ -163,13 +163,17 @@ class Play extends Phaser.Scene {
 
     preload() {
         this.load.path = "./assets/";
+<<<<<<< HEAD
         //this.load.image("title", "image/title.png");
         this.load.image('ground', 'image/background.png')
         this.load.image('character', 'image/bobbytheMC.png')
+=======
+        this.load.image('ground', 'image/ground.png')
+        this.load.image('character', 'image/mc.png')
+>>>>>>> 11fabd25a6d933e6f0d6298d19346c2831a719f3
         this.load.image('cards', 'image/door.png')
         this.load.image('enemy1', 'image/police.png')
         this.load.audio("atkhit", "audio/atkhit.mp3");
-        this.load.audio("step", "audio/step.mp3");
     }
 
     create() {
