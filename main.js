@@ -7,25 +7,50 @@ var browserHeight = window.innerHeight || document.documentElement.clientHeight 
 var isPortrait = browserHeight > browserWidth;
 
 // Calculate the desired width and height based on the aspect ratio
-desiredWidth = isPortrait ? browserHeight * (1080 / 600) : browserWidth;
-desiredHeight = isPortrait ? browserHeight : browserWidth * (600 / 1080);
+if (isPortrait) {
+  desiredWidth = browserHeight;
+  desiredHeight = browserHeight;
+}
 
-desiredHeight *= 0.85;
-desiredWidth *= 0.9;
+else {
+  desiredWidth = browserWidth;
+  desiredHeight = browserHeight;
+}
 
-const config = {
-  type: Phaser.AUTO,
-  width: desiredWidth,
-  height: desiredHeight,
-  physics: {
-    default: 'arcade',
-    arcade: {
-        debug: false
-    }
-},
-  scene: [Intro, Menu, Play, Credit, BadEnd, GoodEnd],
-  scale: {autoCenter: Phaser.Scale.CENTER_BOTH}
-};
+let config;
+
+desiredHeight *= 0.95;
+desiredWidth *= 0.95;
+if (!isPortrait) {
+  config = {
+    type: Phaser.AUTO,
+    width: desiredWidth,
+    height: desiredHeight,
+    physics: {
+      default: 'arcade',
+      arcade: {
+          debug: false
+      }
+  },
+    scene: [Guide, Intro, Menu, Play, Credit, BadEnd, GoodEnd],
+    scale: {autoCenter: Phaser.Scale.CENTER_BOTH}
+  };
+}
+
+else {
+  config = {
+    type: Phaser.AUTO,
+    width: desiredWidth,
+    height: desiredHeight,
+    physics: {
+      default: 'arcade',
+      arcade: {
+          debug: false
+      }
+    },
+    scene: [Guide, Intro, Menu, Play, Credit, BadEnd, GoodEnd],
+  };
+}
 
 // Create the Phaser game instance
 const game = new Phaser.Game(config);

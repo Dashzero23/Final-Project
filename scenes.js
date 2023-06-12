@@ -1,3 +1,27 @@
+class Guide extends Phaser.Scene {
+    constructor() {
+        super({key: "Guide"});
+    }
+
+    create() {
+        this.cameras.main.fadeIn(1000, 255, 255, 255);
+        this.cameras.main.setBackgroundColor('#ffffff');
+
+        let textConfig = {
+            fontSize: Math.round(game.config.width * 0.025) + 'px', // Adjust the scaling factor as needed
+            color: '#000000'
+        };
+
+        let intro = this.add.text(desiredWidth / 2, desiredHeight / 2, "If you are playing on mobile\nPlease turn your device horizontally\nand refresh the page\nIf you are on PC, please continue", textConfig).setOrigin(0.5);
+        this.input.on('pointerdown', (pointer) => {
+            // Check if left button was pressed
+            if (pointer.leftButtonDown() ) {
+                // Transition to the Play scene
+                this.scene.start('Intro');
+            }
+        }); 
+    }
+}
 class Intro extends Phaser.Scene {
     constructor() {
         super({key: "Intro"});
@@ -12,7 +36,8 @@ class Intro extends Phaser.Scene {
         let centerX = this.cameras.main.width / 2;
         this.isAnimationFinished = false;
         
-        let Logo = this.add.sprite(centerX, 300, "Logo");
+        let Logo = this.add.sprite(0, 0, "Logo").setOrigin(0);
+        Logo.setScale(game.config.width / Logo.width, game.config.height / Logo.height);
         Logo.alpha = 0;
         this.tweens.add({
           targets: Logo,
@@ -157,9 +182,6 @@ class Play extends Phaser.Scene {
 
     preload() {
         this.load.path = "./assets/";
-        //this.load.image("title", "image/title.png");
-        //this.load.image('ground', 'image/background.png')
-        //this.load.image('character', 'image/bobbytheMC.png')
         this.load.image('ground', 'image/background.png')
         this.load.image('character', 'image/mc.png')
         this.load.image('cards', 'image/tfcard.png')
@@ -172,14 +194,15 @@ class Play extends Phaser.Scene {
         this.enemies = this.physics.add.group();
         this.cards = this.physics.add.group();
         this.ended = false;
- 
         let textConfig = {
             fontSize: Math.round(game.config.width * 0.025) + 'px', // Adjust the scaling factor as needed
-            color: '#000000'
+            color: '#ffffff'
         };
 
         let background = this.add.image(0, 0, 'ground');
-        background.setScale(desiredWidth / background.width, desiredHeight / background.height);
+        this.scalex = desiredWidth / background.width
+        this.scaley = desiredHeight / background.height
+        background.setScale(this.scalex, this.scaley);
         background.setScale(15); // Set the scale to make it 10 times bigger
         background.setPosition(desiredWidth / 2, desiredHeight / 2);
         // Get the scaled dimensions of the background image
@@ -189,7 +212,8 @@ class Play extends Phaser.Scene {
         // Set the size of the physics world to match the scaled background size
         this.physics.world.setBounds(0.43*(-scaledWidth/2), 0.35*(-scaledHeight/2), 0.5*(scaledWidth), 0.4*(scaledHeight));
 
-        this.player = this.physics.add.sprite(desiredWidth / 2, desiredHeight / 2, 'character').setScale(1);
+        this.player = this.physics.add.sprite(desiredWidth / 2, desiredHeight / 2, 'character');
+        this.player.setScale(this.scalex, this.scaley);
         this.cameras.main.startFollow(this.player);
         this.physics.world.enable(this.player);
         this.player.setCollideWorldBounds(true);
@@ -258,9 +282,16 @@ class Play extends Phaser.Scene {
             }
         }
 
+        let controlRect = new Phaser.Geom.Rectangle(40 * this.scalex, 440 * this.scaley, 210 * this.scalex, 220 * this.scaley);
+
         this.input.on('pointerdown', (pointer) => {
             const currentTime = this.time.now;
+            const isPointerInControlArea = controlRect.contains(pointer.x, pointer.y);
 
+            if (isPointerInControlArea) {
+                return;
+            }
+            
             if (currentTime - this.lastCardTime >= this.cardDelay) {
                 this.lastCardTime = currentTime;
 
@@ -275,6 +306,7 @@ class Play extends Phaser.Scene {
                 // Create the three cards with different angles
                 for (let i = -1; i <= 1; i++) {
                     const card = this.physics.add.sprite(playerX, playerY, 'cards');
+                    card.setScale(desiredWidth / background.width, desiredHeight / background.height);
                     const cardAngle = angle + Phaser.Math.DegToRad(i * 15);
                     const cardSpeed = 500;
                     this.cards.add(card);
@@ -292,7 +324,7 @@ class Play extends Phaser.Scene {
 
                     
                 }
-            }
+            };
 
             this.physics.add.collider(this.cards, this.enemies, this.Cardhit, null, this);
         });
@@ -322,8 +354,8 @@ class Play extends Phaser.Scene {
         
                 // Create the enemy sprite at the spawn position
                 const enemy = this.physics.add.sprite(spawnX, spawnY, 'enemy1');
-                enemy.setScale(1);
-                this.enemies.add(enemy, true);
+                enemy.setScale(this.scalex, this.scaley);
+                this.enemies.add(enemy);
 
                 enemy.body.setCollideWorldBounds(true);
 
@@ -358,41 +390,43 @@ class Play extends Phaser.Scene {
 
     update() {
         if (!this.ended) { // Handle player movement
-            let movingUp = false;
-            let movingDown = false;
-            let movingLeft = false;
-            let movingRight = false;
+            // Create movement control rectangles
+            let upRect = new Phaser.Geom.Rectangle(120 * this.scalex, 445 * this.scaley, 50 * this.scalex, 75 * this.scaley); // Rectangle for moving up
+            let downRect = new Phaser.Geom.Rectangle(120 * this.scalex, 580 * this.scaley, 50 * this.scalex, 75 * this.scaley); // Rectangle for moving down
+            let leftRect = new Phaser.Geom.Rectangle(45 * this.scalex, 525 * this.scaley, 70 * this.scalex, 50 * this.scaley); // Rectangle for moving left
+            let rightRect = new Phaser.Geom.Rectangle(175 * this.scalex, 525 * this.scaley, 70 * this.scalex, 50 * this.scaley); // Rectangle for moving right
+            
+            // Draw movement control rectangles
+            const graphics = this.add.graphics().setDepth(1); // Set depth to render on top
+            graphics.fillStyle(0x00ff00, 1); // Set fill color to green with alpha 1 (fully opaque)
+            graphics.fillRectShape(upRect).setScrollFactor(0);
+            graphics.fillRectShape(downRect).setScrollFactor(0);
+            graphics.fillRectShape(leftRect).setScrollFactor(0);
+            graphics.fillRectShape(rightRect).setScrollFactor(0);
 
-            if (this.cursors.up.isDown) {
-                this.movingUp = true;
+            if (this.cursors.up.isDown || Phaser.Geom.Rectangle.Contains(upRect, this.input.activePointer.x, this.input.activePointer.y)) {
                 this.player.setVelocityY(-250);
-            } else if (this.cursors.down.isDown) {
-                this.movingDown = true;
+            } else if (this.cursors.down.isDown || Phaser.Geom.Rectangle.Contains(downRect, this.input.activePointer.x, this.input.activePointer.y)) {
                 this.player.setVelocityY(250);
             } else {
-                this.movingUp = false;
-                this.movingDown = false;
                 this.player.setVelocityY(0); // Stop vertical movement
             }
             
-            if (this.cursors.left.isDown) {
-                this.movingLeft = true;
+            if (this.cursors.left.isDown || Phaser.Geom.Rectangle.Contains(leftRect, this.input.activePointer.x, this.input.activePointer.y)) {
                 this.player.setVelocityX(-250);
-            } else if (this.cursors.right.isDown) {
-                this.movingRight = true;
+            } else if (this.cursors.right.isDown || Phaser.Geom.Rectangle.Contains(rightRect, this.input.activePointer.x, this.input.activePointer.y)) {
                 this.player.setVelocityX(250);
             } else {
-                this.movingLeft = false;
-                this.movingRight = false
                 this.player.setVelocityX(0); // Stop horizontal movement
             }
-
+    
             this.enemies.getChildren().forEach((enemy) => {
                 // Move the enemy towards the player
                 this.physics.moveToObject(enemy, this.player, 320);
             });
         }
     }
+    
 }
 
 class BadEnd extends Phaser.Scene {
