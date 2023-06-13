@@ -172,8 +172,18 @@ class Menu extends Phaser.Scene {
         exitRect.on('pointerup', function() {
             window.close();
         });
+
+        this.add.text(1050, 580, "📺", textConfig).setOrigin(0.5)
+            .setInteractive()
+            .on('pointerdown', () => {
+                if (this.scale.isFullscreen) {
+                    this.scale.stopFullscreen();
+                } else {
+                    this.scale.startFullscreen();
+                }
+            });
     }
-}
+}   
 
 class Instruct extends Phaser.Scene {
     constructor() {
@@ -189,7 +199,7 @@ class Instruct extends Phaser.Scene {
             color: '#000000'
         };
 
-        let intruct = this.add.text(desiredWidth / 2, desiredHeight / 2, "Use the D-pad or WASD to move\nClick on the screen to shoot\nKill the cops before they get you\nClear current room to move to the next one\nGood luck escaping", textConfig).setOrigin(0.5);
+        let intruct = this.add.text(desiredWidth / 2, desiredHeight / 2, "Use the D-pad or WASD to move\nClick on the screen to shoot\nYou can't shoot while moving\nKill the cops before they get you\nClear current room to move to the next one\nGood luck escaping", textConfig).setOrigin(0.5);
         this.input.on('pointerdown', (pointer) => {
             // Check if left button was pressed
             if (pointer.leftButtonDown()) {
