@@ -11,7 +11,7 @@ let config = {
       debug: false
     }
   },
-  scene: [Guide, Intro, Menu, Play, Instruct, Credit, BadEnd, GoodEnd],
+  scene: [Play, Guide, Intro, Menu, Instruct, Credit, BadEnd, GoodEnd],
   scale: {
     mode: Phaser.Scale.FIT, // Fit the game within the fullscreen dimensions
     autoCenter: Phaser.Scale.CENTER_BOTH

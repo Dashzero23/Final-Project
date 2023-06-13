@@ -172,7 +172,7 @@ class Menu extends Phaser.Scene {
         exitRect.on('pointerup', function() {
             window.close();
         });
-
+        
         this.add.text(1050, 580, "📺", textConfig).setOrigin(0.5)
             .setInteractive()
             .on('pointerdown', () => {
@@ -182,6 +182,7 @@ class Menu extends Phaser.Scene {
                     this.scale.startFullscreen();
                 }
             });
+        this.buildArm();
     }
 }   
 
@@ -374,7 +375,26 @@ class Play extends Phaser.Scene {
             shootPointer = pointer;
           }
         });
-        
+        this.buildHand();
+    }
+    buildHand(){
+        this.shoulder = this.add.container(0, 0);
+        this.shoulder.add(this.add.rectangle(0, 0, 50, 5, 0xffffff));
+        this.elbow = this.add.container(25, 0);
+        this.elbow.add(this.add.rectangle(0, 0, 40, 5, 0xaaaaaa));
+        this.shoulder.add(this.elbow);
+        this.wrist = this.add.container(20, 0);
+        this.hand = this.add.rectangle(0, 0, 10, 5, 0x888888);
+        this.wrist.add(this.hand);
+        this.elbow.add(this.wrist);
+    }
+    configHand(){
+        let theta = 2 * Math.PI * this.time.now/1000;
+        let amount = 1 + 0.5 * Math.sin(theta);
+        this.shoulder.angle = 10 * amount;
+        this.elbow.angle = 20 * amount;
+        this.wrist.angle = 60 * amount;
+        this.shoulder.y = 100 + 5 * Math.cos(theta);
     }
 
     spawnEnemy() {
@@ -436,6 +456,7 @@ class Play extends Phaser.Scene {
     }
 
     update() {
+        this.configHand();
         if (!this.ended) { // Handle player movement
             // Create movement control rectangles
             let upRect = new Phaser.Geom.Rectangle(120 * this.scalex, 445 * this.scaley, 50 * this.scalex, 75 * this.scaley); // Rectangle for moving up
@@ -475,7 +496,7 @@ class Play extends Phaser.Scene {
     
             this.enemies.getChildren().forEach((enemy) => {
                 // Move the enemy towards the player
-                this.physics.moveToObject(enemy, this.player, 270);
+                this.physics.moveToObject(enemy, this.player, 250);
             });
         }
     }
@@ -496,13 +517,12 @@ class BadEnd extends Phaser.Scene {
             color: '#000000'
         };
 
-        let endText = this.add.text(desiredWidth / 2, desiredHeight / 2, "Bad Ending: You got caught\nLeft click to restart", textConfig).setOrigin(0.5);
+        this.add.text(desiredWidth / 2, desiredHeight / 2, "Bad Ending: You got caught\nLeft click to restart", textConfig).setOrigin(0.5);
         this.input.on('pointerdown', (pointer) => {
             // Check if left button was pressed
-            if (pointer.leftButtonDown()) {
                 // Transition to the Play scene
                 this.scene.start('Menu');
-            }
+            
         }); 
     }
 }
