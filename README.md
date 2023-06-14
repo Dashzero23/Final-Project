@@ -2,11 +2,11 @@
 
 Group Members:
 
-Jeevithan Mahenthran  
+Jeevithan Mahenthran: Art Design, requirement checking, debugger  
   
-Nguyen Vu
+Nguyen Vu: 3D animation, core gameplay and scene flow
 
-Gabriel Li
+Gabriel Li: Cinematic, audio, concept and ideas
 
 Core Requirement:
 - [project archive]: this GitHub
