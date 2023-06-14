@@ -18,7 +18,7 @@ https://jeeevii.github.io/CMPM120-Scene-Flow-Prototype/
 
 https://github.com/Jeeevii/CMPM120-Cinematics-Prototype 
 
-Theme explain: In a casino setting, control a poker cheater as they evade pursuing cops, surviving for 60 seconds in a race against time, emphasizing the tension between the confined space and the temporal time challenge.
+Theme "nearby in space, but distant in time" explaination: In a casino setting, control a poker cheater as they evade pursuing cops, surviving for 60 seconds in a race against time, emphasizing the tension between the confined space and the temporal time challenge.
 
 Core Requirement:
 - [project archive]: this GitHub
