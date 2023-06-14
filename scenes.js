@@ -17,11 +17,35 @@ class Guide extends Phaser.Scene {
             // Check if left button was pressed
             if (pointer.leftButtonDown() ) {
                 // Transition to the Play scene
-                this.scene.start('Intro');
+                this.scene.start('VideoScene');
             }
         }); 
     }
 }
+
+class VideoScene extends Phaser.Scene {
+    constructor() {
+        super({ key: 'VideoScene' });
+    }
+    preload() {
+        this.load.path = "./assets/";
+        this.load.video('anime', 'video/anim.mp4')
+ 
+    }
+    create() {
+        const video = this.add.video(desiredWidth / 2, desiredHeight / 2, 'anime'); // Use the key of the loaded video
+
+        // Play the video
+        video.play();
+
+        // Transition to the next scene when the video ends
+        video.on('complete', () => {
+            this.scene.start('Intro');
+        });
+    }
+
+}
+
 class Intro extends Phaser.Scene {
     constructor() {
         super({key: "Intro"});
@@ -90,12 +114,16 @@ class Menu extends Phaser.Scene {
     create() {
         this.cameras.main.fadeIn(1000, 255, 255, 255);
         this.cameras.main.setBackgroundColor('#ffffff');
+        let textConfig = {
+            fontSize: Math.round(game.config.width * 0.025) + 'px', // Adjust the scaling factor as needed
+            color: '#000000'
+        };
+
         this.sound.stopAll();
         let bgm = this.sound.add("bgm", {loop : true, autoPlay: true});
         bgm.play();
         bgm.setVolume(1);
         let isPlaying = true;
-
         // Enable global drag input
         this.input.on('dragstart', function (pointer) {
             // Store the initial drag position
@@ -117,7 +145,11 @@ class Menu extends Phaser.Scene {
 
         // Set the scale to fit the entire screen
         bg.setScale(game.config.width / bg.width, game.config.height / bg.height);
-        
+        let bgmText = this.add.text(150, 550, "bgm is playing", {
+            fontSize: Math.round(game.config.width * 0.025) + 'px', // Adjust the scaling factor as needed
+            color: '#ffffff'
+        }).setOrigin(0.5);
+
         let audio = this.add.image(desiredWidth * (50/1080), desiredHeight * (50/600), "audio");
         audio.setScale(0.1*(game.config.width / audio.width), 0.1*(game.config.height / audio.height));
         audio.setInteractive();
@@ -126,22 +158,19 @@ class Menu extends Phaser.Scene {
             if (isPlaying) {
                 this.sound.stopAll();
                 isPlaying = false;
+                bgmText.setAlpha(0);
             }
 
             else {
                 bgm.play();
                 bgm.setVolume(1);
                 isPlaying = true;
+                bgmText.setAlpha(1);
             }
         }, this);
         
         let poker = this.add.image(desiredWidth * (750/1080), this.cameras.main.centerY, "hand");
         poker.setScale(0.5*(game.config.width / poker.width), game.config.height / poker.height);
-
-        let textConfig = {
-            fontSize: Math.round(game.config.width * 0.025) + 'px', // Adjust the scaling factor as needed
-            color: '#000000'
-        };
 
         let menu = this.add.text(desiredWidth * (735/1080), desiredHeight * (100/600), "EXIT   CREDIT    PLAY", textConfig).setOrigin(0.5);
 
@@ -153,7 +182,7 @@ class Menu extends Phaser.Scene {
         playRect.setInteractive(); // Make the rectangle interactive for input events
 
         playRect.on('pointerup', function() {
-          this.scene.start("Instruct");
+          this.scene.start("Instruct", { bgmCheck: isPlaying });
         }, this);
 
         let setRect = this.add.rectangle(desiredWidth * (740/1080), desiredHeight * (100/600), desiredWidth* (160/1080), desiredHeight * (180/600), 0x000000);
@@ -161,7 +190,7 @@ class Menu extends Phaser.Scene {
         setRect.setInteractive(); // Make the rectangle interactive for input events
 
         setRect.on('pointerup', function() {
-          this.scene.start('Credit');
+          this.scene.start('Credit', { bgmCheck: isPlaying });
         }, this);
 
         let exitRect = this.add.rectangle(desiredWidth * (615/1080), desiredHeight * (130/600), desiredWidth* (130/1080), desiredHeight * (160/600), 0x000000);
@@ -172,7 +201,7 @@ class Menu extends Phaser.Scene {
         exitRect.on('pointerup', function() {
             window.close();
         });
-        
+
         this.add.text(1050, 580, "📺", textConfig).setOrigin(0.5)
             .setInteractive()
             .on('pointerdown', () => {
@@ -182,13 +211,18 @@ class Menu extends Phaser.Scene {
                     this.scale.startFullscreen();
                 }
             });
-        this.buildArm();
     }
 }   
 
 class Instruct extends Phaser.Scene {
     constructor() {
         super({key: "Instruct"});
+    }
+
+    init (data)
+    {
+        console.log('init', data);
+        this.isPlaying = data.bgmCheck;
     }
 
     create() {
@@ -205,14 +239,27 @@ class Instruct extends Phaser.Scene {
             // Check if left button was pressed
             if (pointer.leftButtonDown()) {
                 // Transition to the Play scene
-                this.scene.start('Play');
+                this.scene.start('Play', { bgmCheck: this.isPlaying });
             }
-        }); 
+        });
+
+        if (this.isPlaying) {
+            let bgmText = this.add.text(900, 550, "bgm is playing", {
+                fontSize: Math.round(game.config.width * 0.025) + 'px', // Adjust the scaling factor as needed
+                color: '#000000'
+            }).setOrigin(0.5);    
+        }
     }
 }
 class Play extends Phaser.Scene {
     constructor() {
         super({key: "Play"});
+    }
+
+    init (data)
+    {
+        console.log('init', data);
+        this.isPlaying = data.bgmCheck;
     }
 
     preload() {
@@ -237,15 +284,21 @@ class Play extends Phaser.Scene {
         this.isMoving = false;
         
         let background = this.add.image(0, 0, 'ground');
-        this.scalex = desiredWidth / background.width
-        this.scaley = desiredHeight / background.height
+        this.scalex = desiredWidth / background.width;
+        this.scaley = desiredHeight / background.height;
         background.setScale(this.scalex, this.scaley);
         background.setScale(15); // Set the scale to make it 10 times bigger
         background.setPosition(desiredWidth / 2, desiredHeight / 2);
         // Get the scaled dimensions of the background image
         const scaledWidth = background.width * background.scaleX;
         const scaledHeight = background.height * background.scaleY;
-
+        if (this.isPlaying) {
+            let bgmText = this.add.text(900, 550, "bgm is playing", {
+                fontSize: Math.round(game.config.width * 0.025) + 'px', // Adjust the scaling factor as needed
+                color: '#ffffff'
+            }).setOrigin(0.5);
+            bgmText.setScrollFactor(0);
+        }
         // Set the size of the physics world to match the scaled background size
         this.physics.world.setBounds(0.43*(-scaledWidth/2), 0.35*(-scaledHeight/2), 0.5*(scaledWidth), 0.4*(scaledHeight));
 
@@ -310,7 +363,7 @@ class Play extends Phaser.Scene {
 
         function updateCountdown() {
             if (this.countdown <= 0) {
-                this.scene.start('GoodEnd');
+                this.scene.start('GoodEnd', { bgmCheck: this.isPlaying });
             }
 
             else {
@@ -363,38 +416,6 @@ class Play extends Phaser.Scene {
         
           this.physics.add.collider(this.cards, this.enemies, this.Cardhit, null, this);
         });
-        
-        this.input.on('pointerup', (pointer) => {
-          if (pointer === shootPointer) {
-            shootPointer = null;
-          }
-        });
-        
-        this.input.on('pointerdown', (pointer) => {
-          if (!shootPointer && !controlRect.contains(pointer.x, pointer.y)) {
-            shootPointer = pointer;
-          }
-        });
-        this.buildHand();
-    }
-    buildHand(){
-        this.shoulder = this.add.container(0, 0);
-        this.shoulder.add(this.add.rectangle(0, 0, 50, 5, 0xffffff));
-        this.elbow = this.add.container(25, 0);
-        this.elbow.add(this.add.rectangle(0, 0, 40, 5, 0xaaaaaa));
-        this.shoulder.add(this.elbow);
-        this.wrist = this.add.container(20, 0);
-        this.hand = this.add.rectangle(0, 0, 10, 5, 0x888888);
-        this.wrist.add(this.hand);
-        this.elbow.add(this.wrist);
-    }
-    configHand(){
-        let theta = 2 * Math.PI * this.time.now/1000;
-        let amount = 1 + 0.5 * Math.sin(theta);
-        this.shoulder.angle = 10 * amount;
-        this.elbow.angle = 20 * amount;
-        this.wrist.angle = 60 * amount;
-        this.shoulder.y = 100 + 5 * Math.cos(theta);
     }
 
     spawnEnemy() {
@@ -437,6 +458,17 @@ class Play extends Phaser.Scene {
         sfx.play();
         sfx.setVolume(1);
 
+        let cardText = this.add.text(950, 520, "card hit", {
+            fontSize: Math.round(game.config.width * 0.025) + 'px', // Adjust the scaling factor as needed
+            color: '#ffffff'
+        }).setOrigin(0.5);
+        
+        cardText.setScrollFactor(0);
+
+        this.time.delayedCall(1000, () => {
+            cardText.setVisible(false);
+        });
+
         card.destroy();
         enemy.destroy();
     }
@@ -449,14 +481,13 @@ class Play extends Phaser.Scene {
             duration: 1000,
             ease: 'Linear',
             onComplete: () => {
-                this.scene.start('BadEnd');
+                this.scene.start('BadEnd', { bgmCheck: this.isPlaying });
             },
             callbackScope: this
         });
     }
 
     update() {
-        this.configHand();
         if (!this.ended) { // Handle player movement
             // Create movement control rectangles
             let upRect = new Phaser.Geom.Rectangle(120 * this.scalex, 445 * this.scaley, 50 * this.scalex, 75 * this.scaley); // Rectangle for moving up
@@ -496,7 +527,7 @@ class Play extends Phaser.Scene {
     
             this.enemies.getChildren().forEach((enemy) => {
                 // Move the enemy towards the player
-                this.physics.moveToObject(enemy, this.player, 250);
+                this.physics.moveToObject(enemy, this.player, 270);
             });
         }
     }
@@ -508,6 +539,12 @@ class BadEnd extends Phaser.Scene {
         super({key: 'BadEnd'});
     }
 
+    init (data)
+    {
+        console.log('init', data);
+        this.isPlaying = data.bgmCheck;
+    }
+
     create() {
         this.cameras.main.fadeIn(1000, 255, 255, 255);
         this.cameras.main.setBackgroundColor('#ffffff');
@@ -517,14 +554,26 @@ class BadEnd extends Phaser.Scene {
             color: '#000000'
         };
 
-        this.add.text(desiredWidth / 2, desiredHeight / 2, "Bad Ending: You got caught\nLeft click to restart", textConfig).setOrigin(0.5);
-        this.input.on('pointerdown', (pointer) => {
-            // Check if left button was pressed
-                // Transition to the Play scene
-                this.scene.start('Menu');
-            
-        }); 
+        if (this.isPlaying) {
+            let bgmText = this.add.text(900, 550, "bgm is playing", {
+                fontSize: Math.round(game.config.width * 0.025) + 'px', // Adjust the scaling factor as needed
+                color: '#000000'
+            }).setOrigin(0.5);
+        }
+
+        this.add.text(desiredWidth / 2, desiredHeight / 2, "Bad Ending: You got caught", textConfig).setOrigin(0.5);
+
+        let menu = this.add.rectangle(desiredWidth / 2, desiredHeight * 0.9, desiredWidth * (200 / 1080), desiredHeight * (100 / 600), 0x000000); // Set the color of the rectangle to black
+
+        let textMenu = this.add.text(desiredWidth / 2, desiredHeight * 0.9, "Menu", { ...textConfig, color: '#ffffff' }).setOrigin(0.5); // Set the color of the text to white
+
+        menu.setInteractive(); // Make the rectangle interactive for input events
+
+        menu.on('pointerup', function() {
+            this.scene.start('Menu');
+        }, this);
     }
+
 }
 
 class GoodEnd extends Phaser.Scene {
@@ -532,42 +581,75 @@ class GoodEnd extends Phaser.Scene {
         super({key: 'GoodEnd'});
     }
 
+    init (data)
+    {
+        console.log('init', data);
+        this.isPlaying = data.bgmCheck;
+    }
+
     create() {
         this.cameras.main.fadeIn(1000, 255, 255, 255);
         this.cameras.main.setBackgroundColor('#ffffff');
-        
+
         let textConfig = {
             fontSize: Math.round(game.config.width * 0.025) + 'px', // Adjust the scaling factor as needed
             color: '#000000'
         };
 
-        let endText = this.add.text(desiredWidth / 2, desiredHeight / 2, "Good Ending: You survived\nLeft click to restart", textConfig).setOrigin(0.5);
-        this.input.on('pointerdown', (pointer) => {
-            // Check if left button was pressed
-            if (pointer.leftButtonDown()) {
-                // Transition to the Play scene
-                this.scene.start('Menu');
-            }
-        }); 
+        if (this.isPlaying) {
+            let bgmText = this.add.text(900, 550, "bgm is playing", {
+                fontSize: Math.round(game.config.width * 0.025) + 'px', // Adjust the scaling factor as needed
+                color: '#000000'
+            }).setOrigin(0.5);
+        }
+
+        this.add.text(desiredWidth / 2, desiredHeight / 2, "Good Ending: You survived", textConfig).setOrigin(0.5);
+
+        let menu = this.add.rectangle(desiredWidth / 2, desiredHeight * 0.9, desiredWidth * (200 / 1080), desiredHeight * (100 / 600), 0x000000); // Set the color of the rectangle to black
+
+        let textMenu = this.add.text(desiredWidth / 2, desiredHeight * 0.9, "Menu", { ...textConfig, color: '#ffffff' }).setOrigin(0.5); // Set the color of the text to white
+
+        menu.setInteractive(); // Make the rectangle interactive for input events
+
+        menu.on('pointerup', function() {
+            this.scene.start('Menu');
+        }, this);
     }
-}
+} 
 
 class Credit extends Phaser.Scene {
     constructor() {
         super({key: "Credit"});
     }
 
+    init (data)
+    {
+        console.log('init', data);
+        this.isPlaying = data.bgmCheck;
+    }
+
     create() {
         this.cameras.main.setBackgroundColor('#ffffff');
         let textConfig = {
             fontSize: Math.round(game.config.width * 0.025) + 'px', // Adjust the scaling factor as needed
             color: '#000000'
         };
-        let tempSet = this.add.text(desiredWidth / 2, desiredHeight / 2, "Core gameplay: Nguyen Vu\nArt: Jeevithan Mahenthran\nConcepts and Cinematic: Gabriel Yunjia", textConfig).setOrigin(0.5);
-        let textBack = this.add.text(desiredWidth * 0.1, desiredHeight * 0.9, "Back", textConfig).setOrigin(0.5);
+
+        if (this.isPlaying) {
+            let bgmText = this.add.text(900, 550, "bgm is playing", {
+                fontSize: Math.round(game.config.width * 0.025) + 'px', // Adjust the scaling factor as needed
+                color: '#000000'
+            }).setOrigin(0.5);    
+        }
+
         let back = this.add.rectangle(desiredWidth * 0.1, desiredHeight * 0.9, desiredWidth* (200/1080), desiredHeight * (100/600), 0x000000);
-        back.setAlpha(0.001);
         back.setInteractive(); // Make the rectangle interactive for input events
+
+        let tempSet = this.add.text(desiredWidth / 2, desiredHeight / 2, "Core gameplay: Nguyen Vu\nArt: Jeevithan Mahenthran\nConcepts and Cinematic: Gabriel Yunjia", textConfig).setOrigin(0.5);
+        let textBack = this.add.text(desiredWidth * 0.1, desiredHeight * 0.9, "Back", {
+            fontSize: Math.round(game.config.width * 0.025) + 'px', // Adjust the scaling factor as needed
+            color: '#ffffff'
+        }).setOrigin(0.5);
 
         back.on('pointerup', function() {
             this.scene.start('Menu');
