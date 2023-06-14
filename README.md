@@ -8,7 +8,7 @@ Nguyen Vu: 3D animation, core gameplay and scene flow
 
 Gabriel Li: Cinematic, audio, concept and ideas
 
-Link to game: https://github.com/dashzero203/Final-Project/deployments/activity_log?environment=github-pages  
+Link to game: https://dashzero203.github.io/Final-Project/ 
 
 Link to prototypes: 
 
