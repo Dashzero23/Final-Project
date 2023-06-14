@@ -8,6 +8,15 @@ Nguyen Vu: 3D animation, core gameplay and scene flow
 
 Gabriel Li: Cinematic, audio, concept and ideas
 
+Link to game: https://github.com/dashzero203/Final-Project/deployments/activity_log?environment=github-pages
+Link to prototypes: 
+https://jeeevii.github.io/CMPM120-Final-Core-Gameplay-Prototype/
+
+https://jeeevii.github.io/CMPM120-Scene-Flow-Prototype/
+
+https://github.com/Jeeevii/CMPM120-Cinematics-Prototype 
+
+
 Core Requirement:
 - [project archive]: this GitHub
 - [source code]: code files in this GitHub
