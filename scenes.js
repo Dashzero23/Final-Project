@@ -92,7 +92,7 @@ class Intro extends Phaser.Scene {
 
     update() {
         if (this.isAnimationFinished) {
-          this.scene.start("Menu");
+          this.scene.start("Menu", { bgmCheck: true, firstTime: true });
         }
     }
 }
@@ -100,6 +100,13 @@ class Intro extends Phaser.Scene {
 class Menu extends Phaser.Scene {
     constructor() {
         super({key: "Menu"});
+    }
+
+    init (data)
+    {
+        console.log('init', data);
+        this.isPlaying = data.bgmCheck;
+        this.first = data.firstTime;
     }
 
     preload() {
@@ -119,11 +126,10 @@ class Menu extends Phaser.Scene {
             color: '#000000'
         };
 
-        this.sound.stopAll();
-        let bgm = this.sound.add("bgm", {loop : true, autoPlay: true});
-        bgm.play();
-        bgm.setVolume(1);
-        let isPlaying = true;
+        let bgm = this.sound.add("bgm", {loop : true, autoPlay: false});
+
+        
+        
         // Enable global drag input
         this.input.on('dragstart', function (pointer) {
             // Store the initial drag position
@@ -149,22 +155,34 @@ class Menu extends Phaser.Scene {
             fontSize: Math.round(game.config.width * 0.025) + 'px', // Adjust the scaling factor as needed
             color: '#ffffff'
         }).setOrigin(0.5);
+        bgmText.setAlpha(0);
 
         let audio = this.add.image(desiredWidth * (50/1080), desiredHeight * (50/600), "audio");
         audio.setScale(0.1*(game.config.width / audio.width), 0.1*(game.config.height / audio.height));
         audio.setInteractive();
 
+        if (this.first) {
+            bgm.play();
+            bgm.setVolume(1);
+            this.isPlaying = true;
+            bgmText.setAlpha(1);
+        }
+
+        if (this.isPlaying) {
+            bgmText.setAlpha(1);
+        }
+
         audio.on('pointerup', function() {
-            if (isPlaying) {
+            if (this.isPlaying) {
                 this.sound.stopAll();
-                isPlaying = false;
+                this.isPlaying = false;
                 bgmText.setAlpha(0);
             }
 
             else {
                 bgm.play();
                 bgm.setVolume(1);
-                isPlaying = true;
+                this.isPlaying = true;
                 bgmText.setAlpha(1);
             }
         }, this);
@@ -182,7 +200,7 @@ class Menu extends Phaser.Scene {
         playRect.setInteractive(); // Make the rectangle interactive for input events
 
         playRect.on('pointerup', function() {
-          this.scene.start("Instruct", { bgmCheck: isPlaying });
+          this.scene.start("Instruct", { bgmCheck: this.isPlaying });
         }, this);
 
         let setRect = this.add.rectangle(desiredWidth * (740/1080), desiredHeight * (100/600), desiredWidth* (160/1080), desiredHeight * (180/600), 0x000000);
@@ -190,7 +208,7 @@ class Menu extends Phaser.Scene {
         setRect.setInteractive(); // Make the rectangle interactive for input events
 
         setRect.on('pointerup', function() {
-          this.scene.start('Credit', { bgmCheck: isPlaying });
+          this.scene.start('Credit', { bgmCheck: this.isPlaying });
         }, this);
 
         let exitRect = this.add.rectangle(desiredWidth * (615/1080), desiredHeight * (130/600), desiredWidth* (130/1080), desiredHeight * (160/600), 0x000000);
@@ -570,7 +588,7 @@ class BadEnd extends Phaser.Scene {
         menu.setInteractive(); // Make the rectangle interactive for input events
 
         menu.on('pointerup', function() {
-            this.scene.start('Menu');
+            this.scene.start('Menu', { bgmCheck: this.isPlaying, firstTime: false });
         }, this);
     }
 
@@ -612,7 +630,7 @@ class GoodEnd extends Phaser.Scene {
         menu.setInteractive(); // Make the rectangle interactive for input events
 
         menu.on('pointerup', function() {
-            this.scene.start('Menu');
+            this.scene.start('Menu', { bgmCheck: this.isPlaying, firstTime: false });
         }, this);
     }
 } 
@@ -652,7 +670,7 @@ class Credit extends Phaser.Scene {
         }).setOrigin(0.5);
 
         back.on('pointerup', function() {
-            this.scene.start('Menu');
+            this.scene.start('Menu', { bgmCheck: this.isPlaying, firstTime: false });
         }, this);
     }
 }
