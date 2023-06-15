@@ -32,3 +32,9 @@ Selectable Requirements:
 - Advanced visual asset: there is a 3D mesh animation done in blender as the intro
 - Procedural graphics: there are rectangles serve as back buttons for the Credit as well as the endings
 - Complete closed captioning: the bgm is displayed with "bgm is playing" and card sfx is displayed with "card hit"
+
+Credits:
+
+All Music done By Gabriel Li and Lucas Rodrigues (Self-Made)
+All art (including logo) done By Jeevithan Mahenthran
+Animation done by Nguyen Vu (via blender)
