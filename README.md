@@ -1,4 +1,4 @@
-# Final-Project
+# Final-Project for CMPM 120
 
 Group Members:
 
